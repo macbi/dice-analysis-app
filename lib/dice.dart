@@ -1,10 +1,14 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:dice_analysis/model/dice_roll_model.dart';
+
+final randomizer = Random();
 
 class Dice extends StatefulWidget {
-  const Dice(this.rollResult, {super.key, required this.onRoll});
+  const Dice({super.key, required this.onRoll, required this.diceColor});
 
-  final int rollResult;
-  final void Function() onRoll;
+  final void Function(int, Category) onRoll;
+  final Category diceColor;
 
   @override
   State<Dice> createState() {
@@ -13,26 +17,46 @@ class Dice extends StatefulWidget {
 }
 
 class _DiceState extends State<Dice> {
+  int currentDiceRoll = 1;
+
+  void rollDice() {
+    setState(() {
+      currentDiceRoll = randomizer.nextInt(6) + 1;
+      widget.onRoll(currentDiceRoll, widget.diceColor);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        Image.asset(
-          'assets/images/dice-${widget.rollResult}.png',
-          width: 100,
+        const SizedBox(
+          width: 10,
+        ),
+        Column(
+          children: [
+            Image.asset(
+              'assets/images/dice-$currentDiceRoll.png',
+              width: 100,
+              color: categoryColors[widget.diceColor],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            FilledButton(
+              onPressed: rollDice,
+              style: TextButton.styleFrom(
+                  side: const BorderSide(color: Colors.black87, width: 3),
+                  padding: const EdgeInsets.all(10),
+                  foregroundColor: Colors.black87,
+                  backgroundColor: Colors.transparent,
+                  textStyle: const TextStyle(fontSize: 20)),
+              child: const Text('Roll Dice'),
+            ),
+          ],
         ),
         const SizedBox(
-          height: 20,
-        ),
-        FilledButton(
-          onPressed: widget.onRoll,
-          style: TextButton.styleFrom(
-              side: const BorderSide(color: Colors.black87, width: 3),
-              padding: const EdgeInsets.all(10),
-              foregroundColor: Colors.black87,
-              backgroundColor: Colors.transparent,
-              textStyle: const TextStyle(fontSize: 20)),
-          child: const Text('Roll Dice'),
+          width: 10,
         ),
       ],
     );
